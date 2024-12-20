@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { AlertCircle } from 'lucide-react'
+// import { console } from 'node:inspector/promises'
 
 export default function SignupPage() {
   const [username, setUsername] = useState('')
@@ -37,7 +38,7 @@ export default function SignupPage() {
         setError(data.message);
       }
     } catch (error) {
-      
+      console.log(error);
     }
   }
 

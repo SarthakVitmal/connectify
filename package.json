@@ -2,6 +2,7 @@
   "name": "my-chat-web-app",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -15,6 +16,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.469.0",
+    "mongodb": "^6.12.0",
     "mongoose": "^8.9.2",
     "next": "15.1.2",
     "react": "^19.0.0",
