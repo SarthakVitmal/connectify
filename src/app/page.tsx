@@ -98,9 +98,9 @@ export default function LandingPage() {
         <section className="py-20 bg-teal-600 text-white">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h2 className="text-3xl font-bold mb-8">Ready to get started?</h2>
-            <p className="text-xl mb-10">Join millions of users who trust ChatApp for their communication needs.</p>
+            <p className="text-xl mb-10">Join millions of users who trust Connectify for their communication needs.</p>
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Button size="lg" className="bg-white text-teal-600 hover:bg-gray-100">
+              <Button onClick={() => {window.location.href='/signup'}} size="lg" className="bg-white text-teal-600 hover:bg-gray-100">
                 Sign Up Now
               </Button>
             </motion.div>

@@ -22,9 +22,19 @@ export default function LoginPage() {
       if (email === "" || password === "") {
         setError('Please enter both email and password')
       } else {
-        // Here you would typically make an API call to authenticate the user
-        // For now, we'll just simulate a successful login
-        router.push('/chat')
+        const response = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email, password }),
+        })
+        if (response.ok) {
+          router.push('/chat')
+        } else {
+          const data = await response.json()
+          setError(data.error)
+        }
       }
     } catch (error) {
       setError('An unexpected error occurred. Please try again.')

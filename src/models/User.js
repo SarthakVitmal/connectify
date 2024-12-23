@@ -19,6 +19,10 @@ const UserSchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
     },
+    isVerified: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 export default mongoose.models.User || mongoose.model('User', UserSchema);
