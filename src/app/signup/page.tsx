@@ -9,6 +9,9 @@ import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { AlertCircle } from 'lucide-react'
 import Link from 'next/link'
+import { toast } from 'react-toastify'
+import { signIn } from 'next-auth/react';
+
 
 export default function SignupPage() {
   const [username, setUsername] = useState('')
@@ -34,6 +37,7 @@ export default function SignupPage() {
         body: JSON.stringify({ username, email, password }),
       });
       if (response.ok) {
+        toast.success('Verify your email to complete registration');
         router.push('/login');
       } else {
         const data = await response.json();
@@ -64,7 +68,7 @@ export default function SignupPage() {
                 <Input 
                   id="username" 
                   type="text" 
-                  placeholder="Choose a username"
+                  placeholder="Username"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   required

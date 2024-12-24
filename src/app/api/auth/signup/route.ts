@@ -2,6 +2,7 @@ import {NextResponse} from 'next/server'
 import User from '@/models/user'
 import bcrypt from 'bcryptjs';
 import { connectToDatabase } from '../../../lib/db'
+import { sendMail } from '@/helper/mailer';
 
 export async function POST(req:Request) {
     try {
@@ -13,12 +14,13 @@ export async function POST(req:Request) {
             return NextResponse.json({ message: `User already exists with this email` }, { status: 400 });
         }
         const hashedPassword = await bcrypt.hash(password, 12);
-        const user = new User({
+        const newUser = new User({
             username,
             email,
-            password: hashedPassword
+            password: hashedPassword,
         });
-        await user.save();
+        const savedUser = await newUser.save();
+        await sendMail(email, 'VERIFY', savedUser._id);
         return NextResponse.json({ message: 'User registered successfully' }, { status: 201 });
     } catch (error) {
         return NextResponse.json(
