@@ -79,6 +79,7 @@ export default function LoginPage() {
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
                 />
               </div>
+              <Link href="/forgotpassword" className="text-sm text-teal-600 hover:underline">Forgot password?</Link>
               {error && (
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
