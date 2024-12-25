@@ -2,8 +2,8 @@ import {NextResponse,NextRequest} from 'next/server'
 
 export function middleware(request:NextRequest){
     const path = request.nextUrl.pathname;
-    const isPublicPath = path == '/' || path == '/verifyemail' || path == '/forgotpassword' || path == '/resetpassword' ;
-    const isPrivatePath = path == '/chat' || path == '/login' || path == '/signup';
+    const isPublicPath = path == '/' || path == '/verifyemail' || path == '/forgotpassword' || path == '/resetpassword' || path == '/login' || path == '/signup' ;
+    const isPrivatePath = path == '/chat';
     const token = request.cookies.get('token');
     const hasValidQuery = request.nextUrl.searchParams.get('token'); // Example check for a valid token in query params
 
