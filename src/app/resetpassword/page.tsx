@@ -1,8 +1,8 @@
-'use client'
+'use client';
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import axios from "axios";
-import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "react-hot-toast";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Loader2, EyeIcon, EyeOffIcon, AlertCircle } from "lucide-react";
 import { motion } from "framer-motion";
 
-export default function ResetPassword() {
+function ResetPasswordContent() {
   const [loading, setLoading] = useState(false);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -137,5 +137,13 @@ export default function ResetPassword() {
         </Card>
       </motion.div>
     </div>
+  );
+}
+
+export default function ResetPassword() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ResetPasswordContent />
+    </Suspense>
   );
 }
