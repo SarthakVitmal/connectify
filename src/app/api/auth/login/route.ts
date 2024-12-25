@@ -1,5 +1,4 @@
 import { NextResponse ,NextRequest } from 'next/server';
-import { Request } from 'express';
 import passport from 'passport';
 import User from '@/models/user';
 import bcryptjs from 'bcryptjs';
