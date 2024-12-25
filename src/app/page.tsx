@@ -15,12 +15,12 @@ export default function LandingPage() {
             <ul className="flex space-x-4">
               <li>
                 <Button asChild variant="ghost" className="text-teal-600 hover:text-teal-800 hover:bg-teal-50">
-                  <Link href="/workinprogress">Login</Link>
+                  <Link href="/login">Login</Link>
                 </Button>
               </li>
               <li>
                 <Button asChild className="bg-teal-500 text-white hover:bg-teal-600">
-                  <Link href="/workinprogress">Sign Up</Link>
+                  <Link href="/signup">Sign Up</Link>
                 </Button>
               </li>
             </ul>
@@ -38,7 +38,7 @@ export default function LandingPage() {
               Experience the future of communication with our intuitive and powerful chat platform. Stay connected with friends, family, and colleagues, anytime, anywhere.
             </p>
             <Button asChild size="lg" className="bg-teal-500 text-white hover:bg-teal-600">
-              <Link href="/workinprogress" className="inline-flex items-center">
+              <Link href="/login" className="inline-flex items-center">
                 Get Started
                 <ChevronRight className="ml-2 h-4 w-4" />
               </Link>
@@ -79,7 +79,7 @@ export default function LandingPage() {
             <h2 className="text-3xl font-bold mb-8">Ready to get started?</h2>
             <p className="text-xl mb-10 text-teal-700">Join millions of users who trust Connectify for their communication needs.</p>
             <Button asChild size="lg" className="bg-teal-500 text-white hover:bg-teal-600">
-              <Link href="/workinprogress">Sign Up Now</Link>
+              <Link href="/signup">Sign Up Now</Link>
             </Button>
           </div>
         </section>
