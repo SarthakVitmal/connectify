@@ -1,5 +1,5 @@
 import {NextResponse} from 'next/server'
-import User from '@/models/user'
+import User from '@/models/User'
 import bcrypt from 'bcryptjs';
 import { connectToDatabase } from '../../../lib/db'
 import { sendMail } from '@/helper/mailer';

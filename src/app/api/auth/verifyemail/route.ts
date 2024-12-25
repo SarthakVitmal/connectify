@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import User from '@/models/user'
+import User from '@/models/User'
 import { connectToDatabase } from '../../../lib/db'
 export async function POST(req:Request){
     try {

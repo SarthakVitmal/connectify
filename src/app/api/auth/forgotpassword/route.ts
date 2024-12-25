@@ -1,5 +1,5 @@
 import {NextRequest,NextResponse} from 'next/server';
-import User from '@/models/user';
+import User from '@/models/User';
 import { connectToDatabase } from '../../../lib/db'
 import jwt from 'jsonwebtoken';
 import {sendMail} from '@/helper/mailer';
