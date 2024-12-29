@@ -1,18 +1,17 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useParams } from "next/navigation"
 import { toast } from "react-toastify"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Card, CardContent } from "@/components/ui/card"
-import { Settings, LogOut, Search, Globe } from 'lucide-react'
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Label } from "@/components/ui/label"
-import { Switch } from "@/components/ui/switch"
-import GlobalChat from "@/components/ui/GlobalChat"
+import { Settings, LogOut, Search, Menu, X, Send, Video, Maximize2, MoreVertical, ImageIcon, Moon, Sun, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { cn } from "@/lib/utils"
+import GlobalChat from "@/components/ui/global-chat"
+import { MessageCircle } from 'lucide-react'
 
 interface Message {
   id: number
@@ -27,194 +26,255 @@ interface Contact {
   status: 'online' | 'offline'
   lastMessage: string
   avatar: string
+  unread?: number
+  time?: string
 }
 
 export default function ChatApplication() {
   const { username } = useParams()
-  const [darkMode, setDarkMode] = useState(false)
-  const [contacts, setContacts] = useState<Contact[]>([])
-  const [filteredContacts, setFilteredContacts] = useState<Contact[]>([])
+  const [contacts, setContacts] = useState<Contact[]>([
+    {
+      id: 1,
+      name: "Connectify",
+      status: 'online',
+      lastMessage: "Welcome to Connectify",
+      avatar: "",
+      unread: 0,
+      time: ""
+    },
+  ])
+  const [filteredContacts, setFilteredContacts] = useState(contacts)
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null)
-  const [isGlobalChat, setIsGlobalChat] = useState(true)
-  const [messages, setMessages] = useState<Message[]>([])
-  const [message, setMessage] = useState("")
+  const [isGlobalChat, setIsGlobalChat] = useState(false)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [theme, setTheme] = useState<'light' | 'dark'>('light')
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
 
-  // useEffect(() => {
-  //   // Fetch contacts logic here
-  //   const dummyContacts = [
-  //     { id: 1, name: "Alice", status: 'online', lastMessage: "Hey there!", avatar: "/placeholder.svg?height=40&width=40" },
-  //     { id: 2, name: "Bob", status: 'offline', lastMessage: "See you later", avatar: "/placeholder.svg?height=40&width=40" },
-  //   ]
-  //   setContacts(dummyContacts)
-  //   setFilteredContacts(dummyContacts)
-  // }, [])
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null
+    if (savedTheme) {
+      setTheme(savedTheme)
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      setTheme('dark')
+    }
+  }, [])
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', theme === 'dark')
+    localStorage.setItem('theme', theme)
+  }, [theme])
+
+  const toggleTheme = () => {
+    setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light')
+  }
 
   const handleSearch = (searchTerm: string) => {
-    const filtered = contacts.filter(contact => 
+    const filtered = contacts.filter(contact =>
       contact.name.toLowerCase().includes(searchTerm.toLowerCase())
     )
     setFilteredContacts(filtered)
   }
 
   const handleLogout = async () => {
-    await fetch('/api/auth/logout', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ username }),
-    })
-    toast.success('You have been logged out')
-    window.location.href = `${window.location.origin}/login`
+    try {
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username }),
+      })
+      toast.success('You have been logged out')
+      window.location.href = `${window.location.origin}/login`
+    } catch (error) {
+      toast.error('Failed to logout')
+    }
   }
 
-  const handleSendMessage = async () => {
-    if (message.trim()) {
-      const newMessage: Message = {
-        id: messages.length + 1,
-        sender: username as string,
-        content: message,
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      };
+  const toggleSidebar = () => {
+    setIsSidebarCollapsed(prev => !prev)
+  }
 
-      try {
-        const response = await fetch(`/api/chat/messages`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            sender: username,
-            recipient: selectedContact?.name,
-            content: message,
-          }),
-        });
+  // Sidebar content component
+  const SidebarContent = ({ collapsed = false }) => (
+    <div className={cn(
+      "flex flex-col h-full bg-white dark:bg-[#1F1533] text-gray-800 dark:text-white transition-all duration-300",
+      collapsed ? "w-20" : "w-[300px]"
+    )}>
+      <div className="p-4 flex items-center justify-between border-b border-gray-200 dark:border-[#2A1C45]">
+        {!collapsed && (
+          <div className="flex items-center gap-2">
+            <MessageCircle className="h-8 w-8 text-indigo-500" />
 
-        if (!response.ok) {
-          throw new Error(`Failed to send message: ${response.statusText}`);
-        }
+            <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              Connectify
+            </span>
+          </div>
+        )}
+        <Button variant="ghost" size="icon" onClick={toggleSidebar} className="text-gray-800 dark:text-white">
+          {collapsed ? <ChevronRight className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
+        </Button>
+      </div>
 
-        setMessages([...messages, newMessage]);
-        setMessage('');
-      } catch (error) {
-        console.error("Error sending message:", error);
-        toast.error("Failed to send message");
-      }
-    }
-  };
-
-  return (
-    <div className={`flex h-screen bg-indigo-50 ${darkMode ? 'dark' : ''}`}>
-      <Card className="flex flex-col w-80 bg-white dark:bg-indigo-950 border-r border-indigo-200 dark:border-indigo-800">
-        <CardContent className="p-4 border-b border-indigo-200 dark:border-indigo-800">
-          <h1 className="text-2xl font-bold text-indigo-700 dark:text-indigo-300">Connectify</h1>
-        </CardContent>
-        
-        <CardContent className="p-4">
-          <h2 className="text-sm font-semibold text-indigo-600 dark:text-indigo-400 mb-4">Chats</h2>
-          <div className="relative mb-4">
-            <Search className="absolute left-2 top-2.5 h-4 w-4 text-indigo-400" />
+      {!collapsed && (
+        <div className="p-4 border-b border-gray-200 dark:border-[#2A1C45]">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <Input
-              placeholder="Search chats"
-              className="pl-8 bg-indigo-50 dark:bg-indigo-900 border-indigo-200 dark:border-indigo-700"
+              placeholder="Search chats..."
+              className="pl-9 bg-gray-100 dark:bg-[#2A1C45] border-transparent text-gray-800 dark:text-white placeholder-gray-400"
               onChange={(e) => handleSearch(e.target.value)}
             />
           </div>
-          
-          <Button
-            variant={isGlobalChat ? "secondary" : "ghost"}
-            className="w-full justify-start mb-2"
-            onClick={() => setIsGlobalChat(true)}
+        </div>
+      )}
+
+      <ScrollArea className="flex-1 px-2">
+        {filteredContacts.map((contact) => (
+          <div
+            key={contact.id}
+            className={cn(
+              "flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors",
+              selectedContact?.id === contact.id
+                ? "bg-purple-100 dark:bg-[#E91E63]"
+                : "hover:bg-gray-100 dark:hover:bg-[#2A1C45]"
+            )}
+            onClick={() => {
+              setSelectedContact(contact)
+              setIsGlobalChat(false)
+              setIsMobileMenuOpen(false)
+            }}
           >
-            <Globe className="mr-2 h-4 w-4" />
-            Global Chat - Connectify
-          </Button>
-
-          <ScrollArea className="flex-1">
-            <div className="space-y-2">
-              {filteredContacts.map((contact) => (
-                <Button
-                  key={contact.id}
-                  variant={!isGlobalChat && selectedContact?.id === contact.id ? "secondary" : "ghost"}
-                  className="w-full justify-start"
-                  onClick={() => {
-                    setSelectedContact(contact)
-                    setIsGlobalChat(false)
-                  }}
-                >
-                  <Avatar className="h-6 w-6 mr-2">
-                    <AvatarImage src={contact.avatar} alt={contact.name} />
-                    <AvatarFallback>{contact.name.charAt(0)}</AvatarFallback>
-                  </Avatar>
-                  {contact.name}
-                  <span
-                    className={`ml-auto w-2 h-2 rounded-full ${
-                      contact.status === 'online' ? 'bg-green-400' : 'bg-gray-300'
-                    }`}
-                  />
-                </Button>
-              ))}
-            </div>
-          </ScrollArea>
-        </CardContent>
-
-        <CardContent className="mt-auto p-4 border-t border-indigo-200 dark:border-indigo-800 space-y-2">
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline" className="w-full justify-start text-indigo-700 dark:text-indigo-300">
-                <Settings className="mr-2 h-4 w-4" /> Settings
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-80">
-              <div className="flex items-center justify-between space-x-2">
-                <Label htmlFor="dark-mode" className="flex flex-col space-y-1">
-                  <span>Dark mode</span>
-                  <span className="font-normal leading-snug text-indigo-600 dark:text-indigo-300">
-                    Toggle dark mode on or off
-                  </span>
-                </Label>
-                <Switch
-                  id="dark-mode"
-                  checked={darkMode}
-                  onCheckedChange={setDarkMode}
-                />
+            <div className="relative group">
+              <Avatar className="h-10 w-10">
+                <AvatarImage src={contact.avatar} alt={contact.name} />
+                <AvatarFallback>{contact.name.charAt(0)}</AvatarFallback>
+              </Avatar>
+              <span
+                className={cn(
+                  "absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-white dark:border-[#1F1533]",
+                  contact.status === 'online' ? 'bg-green-500' : 'bg-gray-400'
+                )}
+              />
+              {/* Tooltip */}
+              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block px-2 py-1 text-xs font-medium text-white bg-gray-800 rounded shadow-md">
+                {contact.name}
               </div>
-            </PopoverContent>
-          </Popover>
-          
-          <Button 
-            onClick={handleLogout} 
-            variant="outline" 
-            className="w-full justify-start text-indigo-700 dark:text-indigo-300"
-          >
-            <LogOut className="mr-2 h-4 w-4" /> Logout
-          </Button>
-        </CardContent>
-      </Card>
-
-      <Card className="flex-1 flex flex-col bg-white dark:bg-indigo-900">
-        <CardContent className="p-4 border-b border-indigo-200 dark:border-indigo-800">
-          <h2 className="text-xl font-semibold text-indigo-900 dark:text-indigo-100">
-            {isGlobalChat ? "Global Chat" : selectedContact?.name || "Select a chat"}
-          </h2>
-        </CardContent>
-
-        {isGlobalChat ? (
-          <GlobalChat />
-        ) : selectedContact ? (
-          <div className="flex-1 flex items-center justify-center">
-            <p className="text-indigo-600 dark:text-indigo-300">
-              Private chat implementation here
-            </p>
+            </div>
+            {!collapsed && (
+              <div className="flex-1 min-w-0">
+                <div className="flex justify-between items-start">
+                  <span className="font-medium truncate">{contact.name}</span>
+                  <span className="text-xs text-gray-400">{contact.time}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 truncate">{contact.lastMessage}</p>
+                  {contact.unread && (
+                    <span className="ml-2 px-2 py-0.5 text-xs bg-red-500 text-white rounded-full">
+                      {contact.unread}
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
+        ))}
+      </ScrollArea>
+
+      <div className="p-4 border-t border-gray-200 dark:border-[#2A1C45]">
+        {!collapsed && (
+          <Button
+            onClick={toggleTheme}
+            variant="outline"
+            className="w-full justify-start mb-2 text-gray-800 dark:text-white"
+          >
+            {theme === 'light' ? <Moon className="mr-2 h-5 w-5" /> : <Sun className="mr-2 h-5 w-5" />}
+            {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
+          </Button>
+        )}
+        <Button
+          onClick={handleLogout}
+          variant="ghost"
+          className={cn(
+            "w-full justify-start text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-[#2A1C45]",
+            collapsed && "px-0 justify-center"
+          )}
+        >
+          <LogOut className={cn("h-5 w-5", !collapsed && "mr-2")} />
+          {!collapsed && "Logout"}
+        </Button>
+      </div>
+    </div>
+  )
+
+  return (
+    <div className={`flex h-screen overflow-hidden ${theme === 'dark' ? 'dark' : ''}`}>
+      {/* Mobile Menu Button */}
+      <Button
+        variant="ghost"
+        size="icon"
+        className="fixed top-4 left-4 md:hidden z-50 text-gray-800 dark:text-white"
+        onClick={() => setIsMobileMenuOpen(true)}
+      >
+        <Menu className="h-6 w-6" />
+      </Button>
+
+      {/* Mobile Sidebar */}
+      <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+        <SheetContent
+          side="left"
+          className="p-0 bg-white dark:bg-[#1F1533] border-r border-gray-200 dark:border-[#2A1C45]"
+        >
+          <SidebarContent />
+        </SheetContent>
+      </Sheet>
+
+      {/* Desktop Sidebar */}
+      <div className={cn(
+        "hidden md:block border-r border-gray-200 dark:border-[#2A1C45] transition-all duration-300",
+        isSidebarCollapsed ? "w-20" : "w-[300px]"
+      )}>
+        <SidebarContent collapsed={isSidebarCollapsed} />
+      </div>
+
+      {/* Main Chat Area */}
+      <div className="flex-1 flex flex-col bg-gray-50 dark:bg-[#2A1C45] overflow-hidden">
+        {selectedContact ? (
+          <>
+            <div className="px-4 py-3 flex items-center justify-between border-b border-gray-200 dark:border-[#3A2955]">
+              <div className="flex items-center gap-3">
+                <Avatar className="h-10 w-10">
+                  <AvatarImage src={selectedContact.avatar} />
+                  <AvatarFallback>{selectedContact.name.charAt(0)}</AvatarFallback>
+                </Avatar>
+                <div>
+                  <h2 className="font-semibold text-gray-800 dark:text-white">{selectedContact.name}</h2>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{selectedContact.status}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button variant="ghost" size="icon" className="text-gray-600 dark:text-white">
+                  <Video className="h-5 w-5" />
+                </Button>
+                <Button variant="ghost" size="icon" className="text-gray-600 dark:text-white">
+                  <Maximize2 className="h-5 w-5" />
+                </Button>
+                <Button variant="ghost" size="icon" className="text-gray-600 dark:text-white">
+                  <MoreVertical className="h-5 w-5" />
+                </Button>
+              </div>
+            </div>
+            <GlobalChat />
+          </>
         ) : (
-          <div className="flex-1 flex items-center justify-center">
-            <p className="text-indigo-600 dark:text-indigo-300">
-              Select a chat to start messaging
-            </p>
+          <div className="flex-1 flex items-center justify-center text-gray-800 dark:text-white">
+            <div className="text-center space-y-4">
+              <h3 className="text-xl font-semibold">Welcome to Connectify</h3>
+              <p className="text-gray-600 dark:text-gray-400">Select a chat to start messaging</p>
+            </div>
           </div>
         )}
-      </Card>
+      </div>
     </div>
   )
 }

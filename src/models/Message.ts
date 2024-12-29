@@ -1,6 +1,14 @@
 import mongoose from "mongoose";
 import {model, models, Schema} from "mongoose"
 
+const getISTTime = (): Date => {
+    const now = new Date();
+    const utcOffset = now.getTime() + now.getTimezoneOffset() * 60000; // Convert to UTC
+    const istOffset = 5.5 * 3600000; // Add IST offset (5 hours 30 minutes)
+    return new Date(utcOffset + istOffset);
+  };
+
+
 const MessageSchema = new mongoose.Schema({
     senderId:{
         type:Schema.Types.ObjectId,
@@ -22,7 +30,7 @@ const MessageSchema = new mongoose.Schema({
     },
     timestamp:{
         type:Date,
-        default:Date.now()
+        default:getISTTime,
     },
     isRead:{
         type:Boolean,
