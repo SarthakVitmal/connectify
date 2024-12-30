@@ -47,6 +47,6 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 For any inquiries or feedback, please reach out to:
 
-- **Email**: your-email@example.com
+- **Email**: sarthak.vitmal.dev@gmail.com
 - **LinkedIn**: [Your LinkedIn Profile](https://linkedin.com/in/your-profile)
 - **GitHub**: [Your GitHub Profile](https://github.com/your-username)
