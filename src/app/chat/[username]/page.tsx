@@ -12,6 +12,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { cn } from "@/lib/utils"
 import GlobalChat from "@/components/ui/global-chat"
 import { MessageCircle } from 'lucide-react'
+import AiChatBot from "@/components/ui/ai-chat-bot"
 
 interface Message {
   id: number
@@ -39,6 +40,15 @@ export default function ChatApplication() {
       status: 'online',
       lastMessage: "Welcome to Connectify",
       avatar: "",
+      unread: 0,
+      time: ""
+    },
+    {
+      id: 2,
+      name: "AI Chatbot",
+      status: 'online',
+      lastMessage: "Your AI Assistant",
+      avatar: "/ai-avatar.png", 
       unread: 0,
       time: ""
     },
@@ -264,7 +274,11 @@ export default function ChatApplication() {
                 </Button>
               </div>
             </div>
-            <GlobalChat />
+            {selectedContact.name === "AI Chatbot" ? (
+              <AiChatBot />
+            ) : (
+              <GlobalChat />
+            )}
           </>
         ) : (
           <div className="flex-1 flex items-center justify-center text-gray-800 dark:text-white">

@@ -41,10 +41,10 @@ export default function ForgotPassword() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-teal-50 to-cyan-100">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-indigo-500 to-purple-600">
       <Card className="w-[350px] shadow-lg">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center text-teal-500">Forgot Password</CardTitle>
+          <CardTitle className="text-2xl font-bold text-center text-indigo-500">Forgot Password</CardTitle>
           <CardDescription className="text-center">
             Enter your email to reset your password
           </CardDescription>
@@ -75,7 +75,7 @@ export default function ForgotPassword() {
         </CardContent>
         <CardFooter>
           <Button
-            className="w-full bg-teal-500 hover:bg-teal-600 cursor-pointer"
+            className="w-full bg-indigo-500 hover:bg-purple-600 cursor-pointer"
             onClick={onForgotPassword}
             // disabled={buttonDisabled || loading}
           >

@@ -9,9 +9,8 @@ import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { AlertCircle } from 'lucide-react'
 import Link from 'next/link'
-import { toast } from 'react-toastify'
-import { signIn } from 'next-auth/react';
-
+import {useToast} from "@/hooks/use-toast"
+import {ToastAction} from "@/components/ui/toast"
 
 export default function SignupPage() {
   const [username, setUsername] = useState('')
@@ -20,6 +19,7 @@ export default function SignupPage() {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState('')
   const router = useRouter()
+  const {toast} = useToast()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,7 +37,13 @@ export default function SignupPage() {
         body: JSON.stringify({ username, email, password }),
       });
       if (response.ok) {
-        toast.success('Verify your email to complete registration');
+        toast({
+          title: 'Success',
+          description: 'Account created successfully. Please check your email to verify your account.',
+          action: (
+            <ToastAction altText="Verify your email">Verify your email</ToastAction>
+          ),
+        });
         router.push('/login');
       } else {
         const data = await response.json();

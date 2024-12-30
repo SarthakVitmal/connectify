@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Send, Image } from 'lucide-react'
 import { cn } from "@/lib/utils"
 import ErrorPage from '@/components/ui/error'
+import { useContext } from 'react'
 
 interface Message {
   _id: string
@@ -35,24 +36,31 @@ export default function GlobalChat() {
   }
 
   useEffect(() => {
-    fetchMessages()
-    const interval = setInterval(fetchMessages, 3000)
-    return () => clearInterval(interval)
-  }, [])
-
-  useEffect(() => {
     scrollToBottom()
   }, [messages])
 
-  const fetchMessages = async () => {
+  const fetchMessages = async (retryCount = 0) => {
     try {
       const response = await axios.get('/api/chat/messages')
       setMessages(response.data.messages) // Do not reverse here
     } catch (error: any) {
       console.error('Error fetching messages:', error)
       toast.error('Failed to load messages')
+  
+      if (retryCount < 3) { 
+        const delay = Math.pow(2, retryCount) * 1000; 
+        setTimeout(() => fetchMessages(retryCount + 1), delay);
+      } else {
+        setError(true); 
+      }
     }
   }
+  
+  useEffect(() => {
+    fetchMessages()
+    const interval = setInterval(fetchMessages, 3000)
+    return () => clearInterval(interval)
+  }, [])
 
   const handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
     const { scrollHeight, scrollTop, clientHeight } = event.currentTarget
@@ -62,17 +70,18 @@ export default function GlobalChat() {
 
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault()
+    setNewMessage('')
+    scrollAreaRef.current?.scrollTo({ top: scrollAreaRef.current.scrollHeight, behavior: 'smooth' })
     if (!newMessage.trim()) return
 
     setLoading(true)
     try {
-      const response = await axios.post('/api/chat/messages', { 
-        content: newMessage 
+      const response = await axios.post('/api/chat/messages', {
+        content: newMessage
       })
-      
+
       if (response.data.data) {
-        setMessages((prev) => [...prev, response.data.data]) // Add new message at the bottom
-        setNewMessage('')
+        setMessages((prev) => [...prev, response.data.data])
         setAutoScroll(true)
         scrollToBottom()
       }
@@ -85,8 +94,8 @@ export default function GlobalChat() {
 
   const formatTimestamp = (timestamp: string) => {
     const date = new Date(timestamp)
-    return date.toLocaleString('en-IN', { 
-      hour: 'numeric', 
+    return date.toLocaleString('en-IN', {
+      hour: 'numeric',
       minute: 'numeric',
       hour12: true,
       timeZone: 'Asia/Kolkata'
@@ -99,7 +108,7 @@ export default function GlobalChat() {
 
   return (
     <div className="flex flex-col h-full overflow-y-auto">
-      <ScrollArea 
+      <ScrollArea
         className="flex-1"
         onScroll={handleScroll}
         ref={scrollAreaRef}
@@ -110,24 +119,26 @@ export default function GlobalChat() {
               key={`${message._id}-${index}`}
               className={cn(
                 "flex",
-                message.senderId.username === "currentUser" ? "justify-end" : "justify-start"
+                message.senderId?.username === "currentUser" ? "justify-end" : "justify-start"
               )}
             >
               <div className={cn(
                 "flex max-w-[80%] gap-2",
-                message.senderId.username === "currentUser" ? "flex-row-reverse" : "flex-row"
+                message.senderId?.username === "currentUser" ? "flex-row-reverse" : "flex-row"
               )}>
-                <Avatar className="h-8 w-8 self-end">
-                  <AvatarImage 
-                    src={`/placeholder.svg?height=32&width=32&text=${message.senderId.username.charAt(0)}`} 
-                    alt={message.senderId.username} 
-                  />
-                  <AvatarFallback>{message.senderId.username.charAt(0)}</AvatarFallback>
-                </Avatar>
+                {message.senderId?.username !== "currentUser" && (
+                  <Avatar className="h-8 w-8 self-end" title={message.senderId?.username}>
+                    <AvatarImage
+                      src={`/placeholder.svg?height=32&width=32&text=${message.senderId?.username?.charAt(0)}`}
+                      alt={message.senderId?.username || 'User'}
+                    />
+                    <AvatarFallback>{message.senderId?.username?.charAt(0) || 'U'}</AvatarFallback>
+                  </Avatar>
+                )}
                 <div className={cn(
                   "rounded-2xl px-4 py-2 text-sm",
-                  message.senderId.username === "currentUser" 
-                    ? "bg-purple-600 text-white" 
+                  message.senderId?.username === "currentUser"
+                    ? "bg-purple-600 text-white"
                     : "bg-gray-200 dark:bg-[#3A2955] text-gray-800 dark:text-white"
                 )}>
                   <p>{message.content}</p>
@@ -135,6 +146,15 @@ export default function GlobalChat() {
                     {formatTimestamp(message.timestamp)}
                   </span>
                 </div>
+                {message.senderId?.username === "currentUser" && (
+                  <Avatar className="h-8 w-8 self-end">
+                    <AvatarImage
+                      src={`/placeholder.svg?height=32&width=32&text=${message.senderId?.username?.charAt(0)}`}
+                      alt={message.senderId?.username || 'You'}
+                    />
+                    <AvatarFallback>{message.senderId?.username?.charAt(0) || 'Y'}</AvatarFallback>
+                  </Avatar>
+                )}
               </div>
             </div>
           ))}
