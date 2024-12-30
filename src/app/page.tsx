@@ -94,8 +94,8 @@ export default function LandingPage() {
               <Button asChild size="lg" className="bg-indigo-500 text-white hover:bg-indigo-600">
                 <Link href="/signup">Sign Up Now</Link>
               </Button>
-              <Button asChild size="lg" variant="outline" className="bg-white text-indigo-600 hover:bg-indigo-50">
-                <Link href="/features">Learn More</Link>
+              <Button onClick={() => '/workinprogress'} asChild size="lg" variant="outline" className="bg-white text-indigo-600 hover:bg-indigo-50">
+                <Link href="/workinprogress">Learn More</Link>
               </Button>
             </div>
           </div>
