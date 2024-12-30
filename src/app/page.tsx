@@ -1,9 +1,10 @@
 "use client"
 import Link from 'next/link'
 import { Button } from "@/components/ui/button"
-import { ChevronRight, MessageCircle, Shield, Image, Users, Smartphone, Palette } from 'lucide-react'
+import { ChevronRight, MessageCircle, Shield, Image, Users, Smartphone, Palette, Mail, AlertTriangle } from 'lucide-react'
 import { Card, CardContent } from "@/components/ui/card"
 import ThreeJSAnimation from '@/components/ui/threejsanimation'
+import { Badge } from "@/components/ui/badge"
 
 export default function LandingPage() {
   return (
@@ -13,6 +14,7 @@ export default function LandingPage() {
           <Link href="/" className="flex items-center space-x-2">
             <MessageCircle className="h-8 w-8 text-indigo-500" />
             <span className="text-2xl font-bold text-indigo-700">Connectify</span>
+            <Badge variant="secondary" className="bg-indigo-100 text-indigo-800 ml-2">v1.0.0</Badge>
           </Link>
           <nav>
             <ul className="flex space-x-4">
@@ -35,7 +37,7 @@ export default function LandingPage() {
         <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-indigo-500 to-purple-600 text-white">
           <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between">
             <div className="md:w-1/2 mb-10 md:mb-0">
-              <h1 className="text-4xl font-extrabold sm:text-5xl md:text-6xl tracking-tight mb-6">
+              <h1 className="text-4xl font-bold sm:text-5xl md:text-6xl tracking-tight mb-6">
                 Connect Instantly, Chat Seamlessly
               </h1>
               <p className="mt-6 text-xl text-indigo-100 mb-10">
@@ -56,7 +58,7 @@ export default function LandingPage() {
 
         <section className="py-20 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl font-extrabold text-indigo-800 text-center mb-12">
+            <h2 className="text-3xl font-bold text-indigo-800 text-center mb-12">
               Why Choose Connectify?
             </h2>
             <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
@@ -92,42 +94,49 @@ export default function LandingPage() {
               <Button asChild size="lg" className="bg-indigo-500 text-white hover:bg-indigo-600">
                 <Link href="/signup">Sign Up Now</Link>
               </Button>
-              <Button asChild size="lg" variant="outline" className="bg-white text-indigo-600 hover:bg-indigo-50">
-                <Link href="/features">Learn More</Link>
+              <Button onClick={() => '/workinprogress'} asChild size="lg" variant="outline" className="bg-white text-indigo-600 hover:bg-indigo-50">
+                <Link href="/workinprogress">Learn More</Link>
               </Button>
             </div>
           </div>
         </section>
 
-        {/* <section className="py-20 bg-white">
+        <section className="py-20 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl font-extrabold text-indigo-800 text-center mb-12">
-              What Our Users Say
-            </h2>
-            <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-              {[
-                { name: "Alex Johnson", role: "Freelancer", quote: "Connectify has revolutionized how I communicate with my clients. It's fast, secure, and incredibly user-friendly." },
-                { name: "Sarah Lee", role: "Student", quote: "As a student, Connectify helps me stay connected with my study groups. The group chat feature is a game-changer!" },
-                { name: "Michael Chen", role: "Business Owner", quote: "The cross-platform sync is fantastic. I can seamlessly switch between my devices without missing a beat." },
-              ].map((testimonial, index) => (
-                <Card key={index} className="hover:shadow-lg transition-shadow duration-300">
-                  <CardContent className="p-6">
-                    <p className="text-slate-600 mb-4">"{testimonial.quote}"</p>
-                    <div className="flex items-center">
-                      <div className="bg-indigo-100 rounded-full w-12 h-12 flex items-center justify-center mr-4">
-                        <span className="text-indigo-600 font-semibold">{testimonial.name[0]}</span>
-                      </div>
-                      <div>
-                        <p className="font-semibold text-indigo-800">{testimonial.name}</p>
-                        <p className="text-slate-500">{testimonial.role}</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-indigo-800 mb-4">
+                Website Under Development
+              </h2>
+              <p className="text-xl text-indigo-600">
+                Thankyou for your patience.
+              </p>
+            </div>
+            <div className="flex justify-center mb-12">
+              <div className="relative w-64 h-64">
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-32 h-32 border-t-4 border-b-4 border-indigo-500 rounded-full animate-spin"></div>
+                </div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-24 h-24 border-l-4 border-r-4 border-indigo-300 rounded-full animate-spin animation-delay-500"></div>
+                </div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <AlertTriangle className="w-16 h-16 text-indigo-500 animate-pulse" />
+                </div>
+              </div>
+            </div>
+            <div className="text-center">
+              <p className="text-lg text-indigo-800 mb-4">
+                Found a bug? Help us improve!
+              </p>
+              <div className="flex items-center justify-center space-x-2">
+                <Mail className="w-6 h-6 text-indigo-500" />
+                <a href="mailto:sarthakvitmal.dev@gmail.com" className="text-indigo-600 hover:underline">
+                  sarthak.vitmal.dev@gmail.com
+                </a>
+              </div>
             </div>
           </div>
-        </section> */}
+        </section>
       </main>
 
       <footer className="bg-indigo-900 text-indigo-100">
