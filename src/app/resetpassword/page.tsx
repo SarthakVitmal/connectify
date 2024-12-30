@@ -29,6 +29,10 @@ function ResetPasswordContent() {
       setError("Password and Confirm Password do not match");
       return;
     }
+    if(!token){
+      setError("Invalid token");
+      return;
+    }
     try {
       setLoading(true);
       const response = await axios.post("/api/auth/resetpassword", {
@@ -46,7 +50,7 @@ function ResetPasswordContent() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-teal-50 to-cyan-100">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-indigo-500 to-purple-600">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -55,7 +59,7 @@ function ResetPasswordContent() {
       >
         <Card className="shadow-lg">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl font-bold text-center">Reset Password</CardTitle>
+            <CardTitle className="text-2xl font-bold text-center text-indigo-500">Reset Password</CardTitle>
             <CardDescription className="text-center">Enter your new password</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -120,7 +124,7 @@ function ResetPasswordContent() {
           </CardContent>
           <CardFooter>
             <Button
-              className="w-full bg-teal-500 hover:bg-teal-600 cursor-pointer"
+              className="w-full bg-indigo-500 hover:bg-purple-600 cursor-pointer"
               onClick={handleSubmit}
               disabled={loading}
             >

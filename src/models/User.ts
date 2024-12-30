@@ -35,7 +35,12 @@ const UserSchema = new mongoose.Schema({
     forgotPasswordTokenExpiration: {
         type: Date,
     },
+    status:{
+        type: String,
+        enum: ['online','offline'],
+        default: 'offline'
+    },
 });
 
-const User = mongoose.models.User || mongoose.model('User', UserSchema);
+const User = (mongoose.models && mongoose.models.User) || mongoose.model('User', UserSchema);
 export default User;

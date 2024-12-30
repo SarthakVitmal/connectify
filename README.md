@@ -1,35 +1,52 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Connectify Web Application
 
-## Getting Started
-First, run the development server
+Connectify is a feature-rich chat web application built using Next.js and MongoDB. It offers a seamless communication platform where users can:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- Perform one-to-one chats with other users.
+- Participate in a community channel called Connectify, where all members can interact with each other.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Features
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **One-to-One Chats**: Secure and real-time messaging for personalized conversations.
+- **Community Channel**: A default open channel for all members to communicate and share.
+- **Real-Time Messaging**: Messages update in real-time using WebSocket technology.
+- **User Authentication**: Sign up and log in securely using email and password.
+- **Responsive Design**: Optimized for desktops and mobile devices.
+- **Modern UI/UX**: Built with a focus on simplicity and usability.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Tech Stack
 
-## Learn More
+- **Frontend**: [Next.js](https://nextjs.org/) (using the `src/app` directory structure) and TypeScript.
+- **Backend**: Node.js with MongoDB for database management.
+- **Styling**: Tailwind CSS (or an alternative, if necessary).
+- **Real-Time Communication**: WebSockets (e.g., using Socket.IO or alternatives).
+- **Build Tool**: [Vite](https://vitejs.dev/).
 
-To learn more about Next.js, take a look at the following resources:
+## Roadmap
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- [ ] Implement user profile pictures.
+- [ ] Add group chat functionality.
+- [ ] Introduce message read receipts.
+- [ ] Enhance the Connectify community channel with topic-based sub-channels.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Contributing
 
-## Deploy on Vercel
+Contributions are welcome! Please follow these steps:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Fork the repository.
+2. Create a new branch (`git checkout -b feature-name`).
+3. Commit your changes (`git commit -m 'Add feature-name'`).
+4. Push to the branch (`git push origin feature-name`).
+5. Create a pull request.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+## Contact
+
+For any inquiries or feedback, please reach out to:
+
+- **Email**: sarthak.vitmal.dev@gmail.com
+- **LinkedIn**: [Your LinkedIn Profile](https://linkedin.com/in/your-profile)
+- **GitHub**: [Your GitHub Profile](https://github.com/your-username)

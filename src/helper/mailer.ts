@@ -2,6 +2,10 @@ import nodemailer from 'nodemailer';
 import User from '@/models/User';
 import bcrypt from 'bcryptjs';
 import { NextResponse } from 'next/server';
+import { console } from 'node:inspector/promises';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 export const sendMail = async (email: string, emailType: string, userId: string) => {
    try {
@@ -19,16 +23,16 @@ export const sendMail = async (email: string, emailType: string, userId: string)
     })
 }
     const transporter = nodemailer.createTransport({
-        host: "sandbox.smtp.mailtrap.io",
-        port: 2525,
+        service: process.env.SMTP_SERVICE,
         auth: {
-            user: process.env.SEND_EMAIL_USER,
-            pass: process.env.SEND_EMAIL_PASS
-        }
+            user: process.env.SMTP_EMAIL,
+            pass: process.env.SMTP_PASS
+        },
+        logger: true,
     })
 
     const mailOptions = {
-        from: process.env.SEND_EMAIL_USER,
+        from: process.env.SMTP_EMAIL,
         to: email,
         subject: emailType === "VERIFY" ? "Verify your email - Connectify" : "Reset your password - Connectify",
         html: `
@@ -61,7 +65,7 @@ export const sendMail = async (email: string, emailType: string, userId: string)
                     .logo {
                         font-size: 24px;
                         font-weight: bold;
-                        color: teal;
+                        color: indigo;
                     }
                     .content {
                         background-color: #ffffff;
@@ -79,7 +83,7 @@ export const sendMail = async (email: string, emailType: string, userId: string)
                     }
                     .button {
                         display: inline-block;
-                        background: teal;
+                        background: indigo;
                         color: white;
                         padding: 12px 24px;
                         text-decoration: none;
@@ -132,6 +136,8 @@ export const sendMail = async (email: string, emailType: string, userId: string)
     };
 
     const mailResponse = await transporter.sendMail(mailOptions);
+    console.log(process.env.SEND_EMAIL_USER, process.env.SEND_EMAIL_PASS);
+    console.log('Email sent:', mailResponse);
     return mailResponse;
    } catch (error) {
         return NextResponse.json('Error sending email', {status: 500});

@@ -1,35 +1,55 @@
-import {NextResponse,NextRequest} from 'next/server'
+import { NextResponse, NextRequest } from 'next/server';
+import jwt from 'jsonwebtoken';
 
-export function middleware(request:NextRequest){
+export async function middleware(request: NextRequest) {
     const path = request.nextUrl.pathname;
-    const isPublicPath = path == '/verifyemail' || path == '/forgotpassword' || path == '/resetpassword' ;
-    const isPrivatePath = path == '/chat' || path == '/login' || path == '/signup';
     const token = request.cookies.get('token');
-    const hasValidQuery = request.nextUrl.searchParams.get('token'); // Example check for a valid token in query params
+    let tokenData = null;
 
-    // if(isPublicPath && token){
-    //     return NextResponse.redirect(new URL('/chat',request.nextUrl));
-    // }
-    // if(!isPublicPath && !token){
-    //     return NextResponse.redirect(new URL('/',request.nextUrl));
-    // }
-    // if (isPrivatePath && (!hasValidQuery || !token)) {
-    //     return NextResponse.redirect(new URL('/login', request.nextUrl));
-    //   }
-    if(isPrivatePath && !token){
-        return NextResponse.redirect(new URL('/',request.nextUrl));
+    if (token) {
+        try {
+            tokenData = jwt.decode(token.value);
+        } catch (error) {
+            console.error("Failed to decode token", error);
+        }
     }
+
+    const isPublicPath = path === '/' || 
+                        path === '/login' || 
+                        path === '/signup' || 
+                        path === '/verifyemail' || 
+                        path === '/forgotpassword' || 
+                        path === '/resetpassword';
+
+    const isPrivatePath = path.startsWith('/chat/');
+    const urlUsername = path.split('/')[2]; 
+
+    if (isPrivatePath && !tokenData) {
+        return NextResponse.redirect(new URL('/login', request.url));
+    }
+
+    // @ts-ignore
+    if (isPrivatePath && tokenData && urlUsername && tokenData.username !== urlUsername) {
+    // @ts-ignore
+        return NextResponse.redirect(new URL(`/chat/${tokenData.username}`, request.url));
+    }
+
+    if (isPublicPath && tokenData) {
+    // @ts-ignore
+        return NextResponse.redirect(new URL(`/chat/${tokenData.username}`, request.url));
+    }
+
     return NextResponse.next();
 }
 
 export const config = {
-    matcher:[
+    matcher: [
         '/',
         '/login',
         '/signup',
         '/verifyemail',
-        '/chat',
+        '/chat/:path*', 
         '/forgotpassword',
         '/resetpassword'
     ]
-}
+};

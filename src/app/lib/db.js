@@ -1,16 +1,21 @@
 import mongoose from 'mongoose';
+import dotenv from 'dotenv';
 
-const MONGO_URL = process.env.MONGO_URL;
+dotenv.config();
+
+const MONGO_URL = process.env.MONGO_URL || "mongodb+srv://sarthak:sarthak@cluster0.cwdj5.mongodb.net/";
 
 if (!MONGO_URL) {
   throw new Error('MONGO_URL is not set');
 }
 
-let cached = global.mongoose;
+const globalAny = globalThis;
 
-if (!cached) {
-  cached = global.mongoose = { conn: null, promise: null };
+if (!globalAny.mongoose) {
+  globalAny.mongoose = { conn: null, promise: null };
 }
+
+let cached = globalAny.mongoose;
 
 export async function connectToDatabase() {
   if (cached.conn) {
@@ -24,9 +29,9 @@ export async function connectToDatabase() {
     };
 
     cached.promise = mongoose.connect(MONGO_URL, opts)
-      .then((mongoose) => {
+      .then((m) => {
         console.log('Connected to database');
-        return mongoose;
+        return m;
       })
       .catch((error) => {
         console.error('Error connecting to database:', error);

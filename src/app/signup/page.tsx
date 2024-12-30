@@ -9,9 +9,8 @@ import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { AlertCircle } from 'lucide-react'
 import Link from 'next/link'
-import { toast } from 'react-toastify'
-import { signIn } from 'next-auth/react';
-
+import {useToast} from "@/hooks/use-toast"
+import {ToastAction} from "@/components/ui/toast"
 
 export default function SignupPage() {
   const [username, setUsername] = useState('')
@@ -20,6 +19,7 @@ export default function SignupPage() {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState('')
   const router = useRouter()
+  const {toast} = useToast()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,7 +37,13 @@ export default function SignupPage() {
         body: JSON.stringify({ username, email, password }),
       });
       if (response.ok) {
-        toast.success('Verify your email to complete registration');
+        toast({
+          title: 'Success',
+          description: 'Account created successfully. Please check your email to verify your account.',
+          action: (
+            <ToastAction altText="Verify your email">Verify your email</ToastAction>
+          ),
+        });
         router.push('/login');
       } else {
         const data = await response.json();
@@ -50,7 +56,7 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="font-sans flex items-center justify-center min-h-screen bg-gradient-to-br from-teal-50 to-cyan-100">
+    <div className="font-sans flex items-center justify-center min-h-screen bg-gradient-to-br  from-indigo-500 to-purple-600">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -58,7 +64,7 @@ export default function SignupPage() {
       >
         <Card className="w-full max-w-md bg-white bg-opacity-90 backdrop-filter backdrop-blur-sm shadow-xl">
           <CardHeader>
-            <CardTitle className="text-3xl font-bold text-center text-teal-600">Sign Up for Connectify</CardTitle>
+            <CardTitle className="text-3xl font-bold text-center  text-indigo-500">Sign Up for Connectify</CardTitle>
             <CardDescription className="text-center text-gray-600">Create your account to start chatting</CardDescription>
           </CardHeader>
           <form onSubmit={handleSubmit}>
@@ -130,14 +136,14 @@ export default function SignupPage() {
               >
                 <Button 
                   type="submit" 
-                  className="w-full bg-teal-500 text-white hover:bg-teal-600 transition-colors duration-200"
+                  className="w-full  hover:bg-purple-600 text-white bg-indigo-600 transition-colors duration-200"
                 >
                   Sign Up
                 </Button>
               </motion.div>
               <div className="text-center text-sm text-gray-600">
                 Already have an account?{' '}
-                <Link href="/login" className="text-teal-600 hover:underline">
+                <Link href="/login" className="text-indigo-600 hover:underline">
                   Log in
                 </Link>
               </div>
