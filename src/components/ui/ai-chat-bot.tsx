@@ -79,7 +79,7 @@ const ConnectAIPage = () => {
   };
 
   return (
-    <div className="flex flex-col h-full overflow-y-auto">
+    <div className="flex flex-col h-full overflow-y-auto ">
       <ScrollArea
         className="flex-1 p-4 space-y-4"
         ref={scrollAreaRef}
@@ -108,12 +108,12 @@ const ConnectAIPage = () => {
       </ScrollArea>
 
       <form onSubmit={(e) => { e.preventDefault(); sendMessage(); }} className="p-4 border-t border-gray-200">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 ">
           <Input
             type="text"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            className="flex-1 bg-gray-100 border-transparent text-gray-800 placeholder-gray-400"
+            className="flex-1 dark:bg-[#3a2955] bg-gray-100 border-transparent text-gray-800 placeholder-gray-400"
             placeholder="Type a message..."
             disabled={loading}
           />
