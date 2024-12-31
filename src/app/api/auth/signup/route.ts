@@ -16,6 +16,13 @@ export async function POST(req: Request) {
                 { status: 400 }
             );
         }
+        const existingUsername = await User.findOne({ username });
+        if (existingUsername) {
+            return NextResponse.json(
+                { message: `Username already exists` }, 
+                { status: 400 }
+            );
+        }
 
         // Create new user
         const hashedPassword = await bcrypt.hash(password, 12);

@@ -31,6 +31,8 @@ export const sendMail = async (email: string, emailType: string, userId: string)
         logger: true,
     })
 
+    const user = await User.findById(userId);
+
     const mailOptions = {
         from: process.env.SMTP_EMAIL,
         to: email,
@@ -114,7 +116,7 @@ export const sendMail = async (email: string, emailType: string, userId: string)
                     </div>
                     <div class="content">
                         <h1>${emailType === "VERIFY" ? "Verify Your Email" : "Reset Your Password"}</h1>
-                        <p>Hello,</p>
+                        <p>Hello,${user.username}</p>
                         <p>${emailType === "VERIFY" 
                             ? "Thank you for joining Connectify! To complete your registration and verify your email address, please click the button below:" 
                             : "We received a request to reset your password. If you didn't make this request, you can ignore this email. Otherwise, click the button below to reset your password:"
