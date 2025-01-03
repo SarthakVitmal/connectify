@@ -5,10 +5,10 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Send, Image } from 'lucide-react'
+import { Send, Image, Trash2 } from 'lucide-react'
 import { cn } from "@/lib/utils"
 import ErrorPage from '@/components/ui/error'
-import { useContext } from 'react'
+import { MdDelete } from "react-icons/md";
 
 interface Message {
   _id: string
@@ -28,6 +28,24 @@ export default function GlobalChat() {
   const scrollAreaRef = useRef<HTMLDivElement>(null)
   const [autoScroll, setAutoScroll] = useState(true)
   const [error, setError] = useState(false)
+  const [currentUser, setCurrentUser] = useState<{ username: string; _id: string } | null>(null);
+
+  useEffect(() => {
+    // Fetch the current user
+    const fetchCurrentUser = async () => {
+      try {
+        const response = await axios.get("/api/auth/user"); // Replace with your actual API endpoint
+        console.log(response.data)
+        setCurrentUser(response.data);
+      } catch (error) {
+        console.error("Failed to fetch current user:", error);
+      }
+    };
+
+    fetchCurrentUser();
+  }, []);
+
+  const isCurrentUser = (senderId: { _id: string }) => senderId._id === currentUser?._id;
 
   const scrollToBottom = () => {
     if (autoScroll && scrollAreaRef.current) {
@@ -42,20 +60,32 @@ export default function GlobalChat() {
   const fetchMessages = async (retryCount = 0) => {
     try {
       const response = await axios.get('/api/chat/messages')
-      setMessages(response.data.messages) // Do not reverse here
+      setMessages(response.data.messages)
     } catch (error: any) {
       console.error('Error fetching messages:', error)
       toast.error('Failed to load messages')
-  
-      if (retryCount < 3) { 
-        const delay = Math.pow(2, retryCount) * 1000; 
+
+      if (retryCount < 3) {
+        const delay = Math.pow(2, retryCount) * 1000;
         setTimeout(() => fetchMessages(retryCount + 1), delay);
       } else {
-        setError(true); 
+        setError(true);
       }
     }
   }
-  
+
+  const handleDelete = async (messageId: string) => {
+    try {
+      const response = await axios.delete(`/api/chat/messages?message_id=${messageId}`)
+      if (response.status === 200) {
+        setMessages((prev) => prev.filter((message) => message._id !== messageId));
+        return console.log('Message deleted successfully')
+      }
+    } catch (error) {
+      return console.log(error)
+    }
+  }
+
   useEffect(() => {
     fetchMessages()
     const interval = setInterval(fetchMessages, 3000)
@@ -108,45 +138,58 @@ export default function GlobalChat() {
 
   return (
     <div className="flex flex-col h-full overflow-y-auto">
-      <ScrollArea
-        className="flex-1"
-        onScroll={handleScroll}
-        ref={scrollAreaRef}
-      >
-        <div className="flex flex-col gap-4 p-4">
-          {messages.map((message, index) => (
-            <div
-              key={`${message._id}-${index}`}
-              className={cn(
-                "flex",
-                message.senderId?.username === "currentUser" ? "justify-end" : "justify-start"
+    <ScrollArea
+      className="flex-1"
+      onScroll={handleScroll}
+      ref={scrollAreaRef}
+    >
+      <div className="flex flex-col gap-4 p-4">
+        {messages.map((message, index) => (
+          <div
+            key={`${message._id}-${index}`}
+            className={cn(
+              "flex group relative",
+              isCurrentUser(message.senderId) ? "justify-end" : "justify-start"
+            )}
+          >
+            <div className={cn(
+              "flex max-w-[80%] gap-2 relative",
+              isCurrentUser(message.senderId) ? "flex-row-reverse" : "flex-row"
+            )}>
+              {!isCurrentUser(message.senderId) && (
+                <Avatar className="h-8 w-8 self-end" title={message.senderId?.username}>
+                  <AvatarImage
+                    src={`/placeholder.svg?height=32&width=32&text=${message.senderId?.username?.charAt(0)}`}
+                    alt={message.senderId?.username || 'User'}
+                  />
+                  <AvatarFallback>{message.senderId?.username?.charAt(0) || 'U'}</AvatarFallback>
+                </Avatar>
               )}
-            >
               <div className={cn(
-                "flex max-w-[80%] gap-2",
-                message.senderId?.username === "currentUser" ? "flex-row-reverse" : "flex-row"
+                "rounded-2xl px-4 py-2 text-sm relative",
+                isCurrentUser(message.senderId)
+                  ? "bg-purple-600 text-white"
+                  : "bg-gray-200 dark:bg-[#3A2955] text-gray-800 dark:text-white"
               )}>
-                {message.senderId?.username !== "currentUser" && (
-                  <Avatar className="h-8 w-8 self-end" title={message.senderId?.username}>
-                    <AvatarImage
-                      src={`/placeholder.svg?height=32&width=32&text=${message.senderId?.username?.charAt(0)}`}
-                      alt={message.senderId?.username || 'User'}
-                    />
-                    <AvatarFallback>{message.senderId?.username?.charAt(0) || 'U'}</AvatarFallback>
-                  </Avatar>
-                )}
-                <div className={cn(
-                  "rounded-2xl px-4 py-2 text-sm",
-                  message.senderId?.username === "currentUser"
-                    ? "bg-purple-600 text-white"
-                    : "bg-gray-200 dark:bg-[#3A2955] text-gray-800 dark:text-white"
-                )}>
-                  <p>{message.content}</p>
-                  <span className="text-xs opacity-70 mt-1 block">
-                    {formatTimestamp(message.timestamp)}
-                  </span>
-                </div>
-                {message.senderId?.username === "currentUser" && (
+                <p>{message.content}</p>
+                <span className="text-xs opacity-70 mt-1 block">
+                  {formatTimestamp(message.timestamp)}
+                </span>
+              </div>
+
+              {isCurrentUser(message.senderId) && (
+                <>
+                  <button
+                    onClick={() => handleDelete(message._id)}
+                    className={cn(
+                      "absolute -left-8 top-1/2 transform -translate-y-1/2",
+                      "opacity-0 group-hover:opacity-100 transition-opacity duration-200",
+                      "p-1.5 rounded-full bg-red-500 hover:bg-red-600 text-white"
+                    )}
+                    aria-label="Delete message"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
                   <Avatar className="h-8 w-8 self-end">
                     <AvatarImage
                       src={`/placeholder.svg?height=32&width=32&text=${message.senderId?.username?.charAt(0)}`}
@@ -154,12 +197,13 @@ export default function GlobalChat() {
                     />
                     <AvatarFallback>{message.senderId?.username?.charAt(0) || 'Y'}</AvatarFallback>
                   </Avatar>
-                )}
-              </div>
+                </>
+              )}
             </div>
-          ))}
-        </div>
-      </ScrollArea>
+          </div>
+        ))}
+      </div>
+    </ScrollArea>
 
       <form onSubmit={sendMessage} className="mt-0 p-4 border-t border-gray-200 dark:border-[#3A2955]">
         <div className="flex items-center gap-2">
