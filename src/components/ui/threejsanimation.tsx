@@ -32,17 +32,17 @@ const ChatTorusAnimation: React.FC = () => {
     const bubbleMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff })
     const bubbles: THREE.Mesh[] = []
 
-    for (let i = 0; i < 20; i++) {
-      const bubble = new THREE.Mesh(bubbleGeometry, bubbleMaterial)
-      const theta = Math.random() * Math.PI * 2
-      const phi = Math.acos(Math.random() * 2 - 1)
-      const radius = 15 + Math.random() * 5
-      bubble.position.x = radius * Math.sin(phi) * Math.cos(theta)
-      bubble.position.y = radius * Math.sin(phi) * Math.sin(theta)
-      bubble.position.z = radius * Math.cos(phi)
-      scene.add(bubble)
-      bubbles.push(bubble)
-    }
+    // for (let i = 0; i < 20; i++) {
+    //   const bubble = new THREE.Mesh(bubbleGeometry, bubbleMaterial)
+    //   const theta = Math.random() * Math.PI * 2
+    //   const phi = Math.acos(Math.random() * 2 - 1)
+    //   const radius = 15 + Math.random() * 5
+    //   bubble.position.x = radius * Math.sin(phi) * Math.cos(theta)
+    //   bubble.position.y = radius * Math.sin(phi) * Math.sin(theta)
+    //   bubble.position.z = radius * Math.cos(phi)
+    //   scene.add(bubble)
+    //   bubbles.push(bubble)
+    // }
 
     camera.position.z = 30
 
