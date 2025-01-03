@@ -77,3 +77,26 @@ export async function GET(request: NextRequest) {
         );
     }
 }
+
+export async function DELETE(request: NextRequest) {
+    if(request.method === 'DELETE') {
+    try {
+        const user_id = await getDataFromToken(request);
+        if (!user_id) {
+            return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+          }
+        const { searchParams } = new URL(request.url);
+        const message_id = searchParams.get('message_id');
+        if (!message_id) {
+            return NextResponse.json({ error: "Message ID is required" }, { status: 400 });
+          }
+        const deleteMessage = await Message.findOneAndDelete({ _id: message_id, senderId: user_id });
+        if (!deleteMessage) {
+            return NextResponse.json({ error: "Message not found" }, { status: 404 });
+        }
+        else return NextResponse.json({ message: "Message deleted successfully" });
+    } catch (error:any) {
+        return NextResponse.json({ error: "Internal server error: " + error.message }, { status: 500 });
+    }
+}
+}
