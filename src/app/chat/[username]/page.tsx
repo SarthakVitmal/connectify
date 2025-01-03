@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { useParams } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 import { toast } from "react-toastify"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -36,6 +36,7 @@ interface Contact {
 
 export default function ChatApplication() {
   const { username } = useParams()
+  const router = useRouter()
   const [contacts, setContacts] = useState<Contact[]>([
     {
       id: 1,
@@ -105,24 +106,25 @@ export default function ChatApplication() {
   }
 
   const handleSearch = async () => {
-    if (searchTerm.trim()) {
-      setIsSearching(true)
-      try {
-        const response = await fetch(`/api/chat/search-users?username=${searchTerm}`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch users');
-        }
-        const result = await response.json();
-        setSearchResults(result);
-      } catch (error) {
-        console.error('Error during search:', error);
-        setSearchResults([]);
-      } finally {
-        setIsSearching(false)
-      }
-    } else {
-      setSearchResults([]);
-    }
+    // if (searchTerm.trim()) {
+    //   setIsSearching(true)
+    //   try {
+    //     const response = await fetch(`/api/chat/search-users?username=${searchTerm}`);
+    //     if (!response.ok) {
+    //       throw new Error('Failed to fetch users');
+    //     }
+    //     const result = await response.json();
+    //     setSearchResults(result);
+    //   } catch (error) {
+    //     console.error('Error during search:', error);
+    //     setSearchResults([]);
+    //   } finally {
+    //     setIsSearching(false)
+    //   }
+    // } else {
+    //   setSearchResults([]);
+    // }
+    router.push(`/workinprogress`)
   };
 
   const toggleSidebar = () => {
