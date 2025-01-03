@@ -13,6 +13,8 @@ import { cn } from "@/lib/utils"
 import GlobalChat from "@/components/ui/global-chat"
 import { MessageCircle } from 'lucide-react'
 import AiChatBot from "@/components/ui/ai-chat-bot"
+import { Badge, BadgeCheck } from 'lucide-react'
+
 
 interface Message {
   id: number
@@ -29,6 +31,7 @@ interface Contact {
   avatar: string
   unread?: number
   time?: string
+  verified?: boolean
 }
 
 export default function ChatApplication() {
@@ -41,16 +44,18 @@ export default function ChatApplication() {
       lastMessage: "Welcome to Connectify",
       avatar: "",
       unread: 0,
-      time: ""
+      time: "",
+      verified: true
     },
     {
       id: 2,
       name: "AI Chatbot",
       status: 'online',
       lastMessage: "Your AI Assistant",
-      avatar: "/ai-avatar.png", 
+      avatar: "", 
       unread: 0,
-      time: ""
+      time: "",
+      verified: true
     },
   ])
   const [filteredContacts, setFilteredContacts] = useState(contacts)
@@ -59,6 +64,9 @@ export default function ChatApplication() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [theme, setTheme] = useState<'light' | 'dark'>('light')
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [searchResults, setSearchResults] = useState<Contact[]>([])
+  const [isSearching, setIsSearching] = useState(false)
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null
@@ -78,12 +86,7 @@ export default function ChatApplication() {
     setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light')
   }
 
-  const handleSearch = (searchTerm: string) => {
-    const filtered = contacts.filter(contact =>
-      contact.name.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-    setFilteredContacts(filtered)
-  }
+
 
   const handleLogout = async () => {
     try {
@@ -101,6 +104,27 @@ export default function ChatApplication() {
     }
   }
 
+  const handleSearch = async () => {
+    if (searchTerm.trim()) {
+      setIsSearching(true)
+      try {
+        const response = await fetch(`/api/chat/search-users?username=${searchTerm}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch users');
+        }
+        const result = await response.json();
+        setSearchResults(result);
+      } catch (error) {
+        console.error('Error during search:', error);
+        setSearchResults([]);
+      } finally {
+        setIsSearching(false)
+      }
+    } else {
+      setSearchResults([]);
+    }
+  };
+
   const toggleSidebar = () => {
     setIsSidebarCollapsed(prev => !prev)
   }
@@ -115,7 +139,6 @@ export default function ChatApplication() {
         {!collapsed && (
           <div className="flex items-center gap-2">
             <MessageCircle className="h-8 w-8 text-indigo-500" />
-
             <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
               Connectify
             </span>
@@ -129,67 +152,113 @@ export default function ChatApplication() {
       {!collapsed && (
         <div className="p-4 border-b border-gray-200 dark:border-[#2A1C45]">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <Input
-              placeholder="Search chats..."
-              className="pl-9 bg-gray-100 dark:bg-[#2A1C45] border-transparent text-gray-800 dark:text-white placeholder-gray-400"
-              onChange={(e) => handleSearch(e.target.value)}
-            />
+            <div className="flex items-center">
+              <div className="relative flex-grow">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Input
+                  placeholder="Search friends..."
+                  value={searchTerm}
+                  className="pl-9 pr-20 bg-gray-100 dark:bg-[#2A1C45] border-transparent text-gray-800 dark:text-white placeholder-gray-400"
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                />
+              </div>
+              <Button 
+                onClick={handleSearch}
+                className="ml-2 bg-indigo-500 hover:bg-indigo-600 text-white"
+                disabled={isSearching}
+              >
+                {isSearching ? 'Searching...' : 'Search'}
+              </Button>
+            </div>
+            {searchResults.length > 0 && (
+              <div className="absolute z-10 w-full mt-2 bg-white dark:bg-[#2A1C45] border border-gray-200 dark:border-[#3A2955] rounded-md shadow-lg">
+                {searchResults.map((user) => (
+                  <div
+                    key={user.id}
+                    className="flex items-center gap-3 p-3 hover:bg-gray-100 dark:hover:bg-[#3A2955] cursor-pointer"
+                    onClick={() => {
+                      setSelectedContact(user)
+                      setSearchResults([])
+                      setSearchTerm('')
+                    }}
+                  >
+                    {/* <Avatar className="h-10 w-10">
+                      <AvatarImage src={user.avatar} alt={user.name} />
+                      <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                    </Avatar> */}
+                    <div>
+                      <p className="font-medium">{user.name}</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">{user.status}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            {searchTerm && searchResults.length === 0 && !isSearching && (
+              <div className="absolute z-10 w-full mt-2 p-3 bg-white dark:bg-[#2A1C45] border border-gray-200 dark:border-[#3A2955] rounded-md shadow-lg text-center">
+                No users found
+              </div>
+            )}
           </div>
         </div>
       )}
 
-      <ScrollArea className="flex-1 px-2">
-        {filteredContacts.map((contact) => (
-          <div
-            key={contact.id}
-            className={cn(
-              "flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors",
-              selectedContact?.id === contact.id
-                ? "bg-purple-100 dark:bg-[#E91E63]"
-                : "hover:bg-gray-100 dark:hover:bg-[#2A1C45]"
-            )}
-            onClick={() => {
-              setSelectedContact(contact)
-              setIsGlobalChat(false)
-              setIsMobileMenuOpen(false)
-            }}
-          >
-            <div className="relative group">
-              <Avatar className="h-10 w-10">
-                <AvatarImage src={contact.avatar} alt={contact.name} />
-                <AvatarFallback>{contact.name.charAt(0)}</AvatarFallback>
-              </Avatar>
-              <span
-                className={cn(
-                  "absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-white dark:border-[#1F1533]",
-                  contact.status === 'online' ? 'bg-green-500' : 'bg-gray-400'
-                )}
-              />
-              {/* Tooltip */}
-              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block px-2 py-1 text-xs font-medium text-white bg-gray-800 rounded shadow-md">
-                {contact.name}
-              </div>
-            </div>
-            {!collapsed && (
-              <div className="flex-1 min-w-0">
-                <div className="flex justify-between items-start">
-                  <span className="font-medium truncate">{contact.name}</span>
-                  <span className="text-xs text-gray-400">{contact.time}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <p className="text-sm text-gray-600 dark:text-gray-400 truncate">{contact.lastMessage}</p>
-                  {contact.unread && (
-                    <span className="ml-2 px-2 py-0.5 text-xs bg-red-500 text-white rounded-full">
-                      {contact.unread}
-                    </span>
+<ScrollArea className="flex-1 px-2">
+  {filteredContacts.map((contact) => (
+    <div
+      key={contact.id} 
+      className={cn(
+        "flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors",
+        selectedContact?.id === contact.id
+          ? "bg-purple-100 dark:bg-[#E91E63]"
+          : "hover:bg-gray-100 dark:hover:bg-[#2A1C45]"
+      )}
+      onClick={() => {
+        setSelectedContact(contact);
+        setIsGlobalChat(false);
+        setIsMobileMenuOpen(false);
+      }}
+    >
+      <div className="relative group">
+        <Avatar className="h-10 w-10">
+          <AvatarImage src={contact.avatar} alt={contact.name} />
+          <AvatarFallback>{contact.name.charAt(0)}</AvatarFallback>
+        </Avatar>
+        <span
+          className={cn(
+            "absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-white dark:border-[#1F1533]",
+            contact.status === 'online' ? 'bg-green-500' : 'bg-gray-400'
+          )}
+        />
+        {/* Tooltip */}
+        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block px-2 py-1 text-xs font-medium text-white bg-gray-800 rounded shadow-md">
+          {contact.name}
+        </div>
+      </div>
+      {!collapsed && (
+        <div className="flex-1 min-w-0">
+          <div className="flex justify-between items-start">
+            <span className="font-medium truncate">{contact.name}</span>
+            {contact.verified && (
+                    <BadgeCheck className="h-4 w-4 text-blue-500" />
                   )}
-                </div>
-              </div>
+            <span className="text-xs text-gray-400">{contact.time}</span>
+          </div>
+          <div className="flex justify-between items-center">
+            <p className="text-sm text-gray-600 dark:text-gray-400 truncate">{contact.lastMessage}</p>
+            {contact.unread && (
+              <span className="ml-2 px-2 py-0.5 text-xs bg-red-500 text-white rounded-full">
+                {contact.unread}
+              </span>
             )}
           </div>
-        ))}
-      </ScrollArea>
+        </div>
+      )}
+    </div>
+  ))}
+</ScrollArea>
+
 
       <div className="p-4 border-t border-gray-200 dark:border-[#2A1C45]">
         {!collapsed && (
