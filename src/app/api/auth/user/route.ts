@@ -9,6 +9,7 @@ connectToDatabase()
 export async function GET(req: NextRequest) {
   try {
     const token = req.cookies.get("token")?.value;
+    console.log("Received token:", token);
     if (!token) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

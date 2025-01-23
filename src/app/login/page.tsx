@@ -32,7 +32,6 @@ export default function LoginPage() {
         if (response.ok) {
           const data = await response.json()
           const username = data.username;
-          console.log(username)
           router.push(`/chat/${username}`)
         } else {
           const data = await response.json()
