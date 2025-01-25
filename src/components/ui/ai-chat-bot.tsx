@@ -113,7 +113,7 @@ const ConnectAIPage = () => {
             type="text"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            className="flex-1 dark:bg-[#3a2955] bg-gray-100 border-transparent text-gray-800 placeholder-gray-400"
+            className="flex-1 dark:bg-[#3a2955] bg-gray-100 border-transparent text-gray-800 placeholder-gray-400 dark:text-white"
             placeholder="Type a message..."
             disabled={loading}
           />
