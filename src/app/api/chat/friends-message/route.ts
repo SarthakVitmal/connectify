@@ -4,7 +4,6 @@ import Message from '@//models/Message';
 import User from '@//models/User';
 import mongoose from 'mongoose';
 import { getDataFromToken } from '@//helper/getDataFromToken';
-// import { encrypt, decrypt } from '@/utils/encryption';
 
 export async function GET(request: NextRequest) {
   try {
@@ -39,7 +38,7 @@ export async function GET(request: NextRequest) {
         }, { status: 400 });
       }
 
-      const chatId = [senderId, receiverId].sort().join('_');
+      const chatId = [senderId.toString(), receiverId.toString()].sort().join('_');
       
       const messages = await Message.find({ chatId })
         .sort({ createdAt: 1 })
@@ -114,25 +113,9 @@ export async function POST(request: NextRequest) {
       .populate('receiverId', 'username')
       .lean();
 
-    // Decrypt the message for response
-    const transformedMessage = {
-      _id: populatedMessage._id.toString(),
-      content: (populatedMessage.content),
-      senderId: {
-        _id: populatedMessage.senderId._id.toString(),
-        username: populatedMessage.senderId.username
-      },
-      receiverId: {
-        _id: populatedMessage.receiverId._id.toString(),
-        username: populatedMessage.receiverId.username
-      },
-      timestamp: populatedMessage.createdAt,
-      isRead: false
-    };
-
     return NextResponse.json({
       success: true,
-      data: transformedMessage
+      data: populatedMessage
     });
 
   } catch (error: any) {

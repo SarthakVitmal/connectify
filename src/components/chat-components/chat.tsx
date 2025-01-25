@@ -99,28 +99,35 @@ export default function Chat({
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newMessage.trim()) return;
-
+  
     setLoading(true);
     try {
+      const payload: { content: string; receiverId: string; chatId?: string } = {
+        content: newMessage,
+        receiverId: contactId, // Assuming contactId is used for receiverId
+      };
+  
+      // Add chatId only for friend chats
+      if (contactId !== "Connectify") {
+        payload.chatId = `${currentUserId}-${contactId}`;
+      }
+  
       const response = await fetch(sendMessageUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          content: newMessage,
-          receiverId: contactId
-        })
+        body: JSON.stringify(payload),
       });
-
+  
       const data = await response.json();
-
+  
       if (!response.ok) {
         throw new Error(data.error || 'Failed to send message');
       }
-
+  
       if (data.success && data.data) {
-        setMessages(prev => [...prev, data.data]);
+        setMessages((prev) => [...prev, data.data]);
         setNewMessage('');
         if (scrollAreaRef.current) {
           scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
@@ -133,6 +140,8 @@ export default function Chat({
       setLoading(false);
     }
   };
+  
+  
 
   useEffect(() => {
     if (autoScroll && scrollAreaRef.current) {

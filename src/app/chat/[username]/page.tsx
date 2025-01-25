@@ -42,16 +42,16 @@
     const { username } = useParams();
     const router = useRouter();
     const [contacts, setContacts] = useState<Contact[]>([
-      {
-        id: 1,
-        name: "Connectify",
-        status: 'online',
-        lastMessage: "Welcome to Connectify",
-        avatar: "",
-        unread: 0,
-        time: "",
-        verified: true
-      },
+      // {
+      //   id: 1,
+      //   name: "Connectify",
+      //   status: 'online',
+      //   lastMessage: "Welcome to Connectify",
+      //   avatar: "",
+      //   unread: 0,
+      //   time: "",
+      //   verified: true
+      // },
       {
         id: 2,
         name: "AI Chatbot",
