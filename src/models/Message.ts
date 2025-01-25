@@ -8,7 +8,6 @@ const getISTTime = (): Date => {
     return new Date(utcOffset + istOffset);
   };
 
-
 const MessageSchema = new mongoose.Schema({
     senderId:{
         type:Schema.Types.ObjectId,
@@ -23,6 +22,12 @@ const MessageSchema = new mongoose.Schema({
     content:{
         type:String,
         required:true
+        // Store encrypted content
+    },
+    chatId: {
+        type: String,
+        required: true
+        // Will store a unique identifier for each chat combination
     },
     channel:{
         type:String,
@@ -37,6 +42,13 @@ const MessageSchema = new mongoose.Schema({
         default:false
     }
 })
+
+// Create chatId before saving
+MessageSchema.pre('save', function(next) {
+    const participants = [this.senderId, this.receiverId].sort();
+    this.chatId = participants.join('_');
+    next();
+});
 
 const Message = models.Message || model('Message',MessageSchema)
 

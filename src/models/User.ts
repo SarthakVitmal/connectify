@@ -40,6 +40,12 @@ const UserSchema = new mongoose.Schema({
         enum: ['online','offline'],
         default: 'offline'
     },
+    friends: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User'
+        }
+    ]
 });
 
 const User = (mongoose.models && mongoose.models.User) || mongoose.model('User', UserSchema);

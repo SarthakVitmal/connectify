@@ -2,13 +2,13 @@ import mongoose from "mongoose";
 import Schema from "mongoose"
 import {models,model} from "mongoose"
 
-const ContactSchema = new mongoose.Schema({
+const FriendSchema = new mongoose.Schema({
     userId:{
         type:Schema.Types.ObjectId,
         ref:"User",
         required:true
     },
-    contactId:{
+    friendId:{
         type:Schema.Types.ObjectId,
         ref:"User",
         required:true
@@ -26,6 +26,6 @@ const ContactSchema = new mongoose.Schema({
     timestamps:true
 })
 
-const Contact = models.Contact || model('Contact',ContactSchema)
+const Friend = models.Friend || model('Friend',FriendSchema);
 
-export default Contact;
+export default Friend;

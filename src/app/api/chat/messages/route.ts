@@ -64,17 +64,50 @@ export async function GET(request: NextRequest) {
             .populate('senderId', 'username')
             .populate('receiverId', 'username')
             .sort({ timestamp: -1 })
-            .limit(50);
+            .limit(50)
+            .lean();
             
+        const transformedMessages = messages.reverse().map(msg => {
+            if (!msg || !msg.senderId || !msg.receiverId) {
+                console.error('Invalid message data:', msg);
+                return null;
+            }
+
+            // Safely access nested properties
+            const senderData = msg.senderId && typeof msg.senderId === 'object' 
+                ? msg.senderId 
+                : { _id: msg.senderId, username: 'Unknown' };
+
+            const receiverData = msg.receiverId && typeof msg.receiverId === 'object'
+                ? msg.receiverId
+                : { _id: msg.receiverId, username: 'Unknown' };
+
+            return {
+                _id: msg._id?.toString() || 'unknown',
+                content: msg.content || '',
+                senderId: {
+                    _id: senderData._id?.toString() || 'unknown',
+                    username: senderData.username || 'Unknown'
+                },
+                receiverId: {
+                    _id: receiverData._id?.toString() || 'unknown',
+                    username: receiverData.username || 'Unknown'
+                },
+                timestamp: msg.createdAt || msg.timestamp || new Date(),
+                isRead: Boolean(msg.isRead)
+            };
+        }).filter(Boolean); // Remove any null messages
+
         return NextResponse.json({
-            messages: messages.reverse()
+            success: true,
+            messages: transformedMessages
         });
     } catch (error: any) {
         console.error("Error in GET /api/chat/messages:", error);
-        return NextResponse.json(
-            { error: "Internal server error: " + error.message }, 
-            { status: 500 }
-        );
+        return NextResponse.json({ 
+            success: false,
+            error: "Internal server error: " + error.message 
+        }, { status: 500 });
     }
 }
 
