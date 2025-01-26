@@ -1,12 +1,12 @@
 import { useEffect, useState, useRef } from "react";
 import axios from "axios";
-import { toast } from "react-hot-toast";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Send, Image, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { toast, Toaster } from 'sonner'
 
 interface Message {
   _id: string;
@@ -51,7 +51,7 @@ export default function Chat({
         const response = await axios.get("/api/auth/user");
         setCurrentUser(response.data);
       } catch (error) {
-        console.error("Failed to fetch current user:", error);
+        toast.error('Failed to fetch user data');
       }
     };
 
@@ -173,7 +173,7 @@ export default function Chat({
   }
 
   return (
-    <div className="flex flex-col h-full overflow-y-auto">
+    <div className="flex flex-col h-full overflow-y-auto dark:bg-[rgb(45,22,116)] bg-[#F1E6FF]">
       <ScrollArea className="flex-1" ref={scrollAreaRef}>
         <div className="flex flex-col gap-4 p-4">
           {messages.map((message) => (
@@ -183,7 +183,7 @@ export default function Chat({
                   <AvatarImage src={`/placeholder.svg?text=${message.senderId?.username?.charAt(0)}`} />
                   <AvatarFallback>{message.senderId?.username?.charAt(0) || "U"}</AvatarFallback>
                 </Avatar>
-                <div className={cn("rounded-lg p-2", isCurrentUser(message.senderId) ? "bg-purple-600 text-white" : "bg-gray-200")}>
+                <div className={cn("rounded-lg p-2", isCurrentUser(message.senderId) ? "text-[white] bg-[#3D2B6B]" : "bg-gray-200")}>
                   <p>{message.content}</p>
                   <span className="text-xs opacity-50">{formatTimestamp(message.timestamp)}</span>
                 </div>
@@ -195,16 +195,19 @@ export default function Chat({
       <form onSubmit={sendMessage} className="p-4 border-t">
         <div className="flex gap-2">
           <Input 
+            className="bg-[#E7D7F7] text-[#3D2B6B] flex-1"
             type="text" 
             value={newMessage} 
             onChange={(e) => setNewMessage(e.target.value)} 
             placeholder="Type a message..." 
+
           />
-          <Button type="submit" disabled={loading}>
+          <Button className="bg-[#9B70C8]" type="submit" disabled={loading}>
             <Send className="h-4 w-4" />
           </Button>
         </div>
       </form>
+      <Toaster richColors position='top-center' /> {/* Render the Toaster to display toasts */}
     </div>
   );
 }
