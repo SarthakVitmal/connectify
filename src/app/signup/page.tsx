@@ -9,8 +9,8 @@ import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { AlertCircle } from 'lucide-react'
 import Link from 'next/link'
-import {useToast} from "@/hooks/use-toast"
-import {ToastAction} from "@/components/ui/toast"
+import { toast, Toaster } from 'sonner'
+
 
 export default function SignupPage() {
   const [username, setUsername] = useState('')
@@ -19,7 +19,7 @@ export default function SignupPage() {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState('')
   const router = useRouter()
-  const {toast} = useToast()
+  const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,20 +37,14 @@ export default function SignupPage() {
         body: JSON.stringify({ username, email, password }),
       });
       if (response.ok) {
-        toast({
-          title: 'Success',
-          description: 'Account created successfully. Please check your email to verify your account.',
-          action: (
-            <ToastAction altText="Verify your email">Verify your email</ToastAction>
-          ),
-        });
+        toast.success('A verification link has been sent to your email. Please check your inbox to verify your account.', { duration: 5000 });
+        await delay(5000);
         router.push('/login');
       } else {
         const data = await response.json();
         setError(data.message);
       }
     } catch (error) {
-      console.error('Signup error:', error);
       setError('An unexpected error occurred. Please try again.');
     }
   }
@@ -151,6 +145,7 @@ export default function SignupPage() {
           </form>
         </Card>
       </motion.div>
+      <Toaster richColors position='top-center' />
     </div>
   )
 }
