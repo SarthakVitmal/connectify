@@ -250,7 +250,7 @@
 
     const SidebarContent = ({ collapsed = false }) => (
       <div className={cn(
-        "flex flex-col h-full bg-white dark:bg-[#1F1533] text-gray-800 dark:text-white transition-all duration-300",
+        "flex flex-col h-full gap-3 bg-[#1A0A38] dark:bg-[#1F1533] text-gray-800 dark:text-white",
         collapsed ? "w-20" : "w-[300px]"
       )}>
         <div className="p-4 flex items-center justify-between border-b border-gray-200 dark:border-[#2A1C45]">
@@ -262,7 +262,7 @@
               </span>
             </div>
           )}
-          <Button variant="ghost" size="icon" onClick={toggleSidebar} className="text-gray-800 dark:text-white">
+          <Button variant="ghost" size="icon" onClick={toggleSidebar} className="text-purple-50 bg-purple-500 dark:text-white">
             {collapsed ? <ChevronRight className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
           </Button>
         </div>
@@ -284,7 +284,7 @@
                 </div>
                 <Button
                   onClick={handleSearch}
-                  className="ml-2 bg-indigo-500 hover:bg-indigo-600 text-white"
+                  className="ml-2 bg-purple-500 hover:bg-purple-600 text-white"
                   disabled={isSearching}
                 >
                   {isSearching ? 'Searching...' : 'Search'}
@@ -312,7 +312,7 @@
                           e.stopPropagation();
                           handleAddFriend(user.id.toString());
                         }}
-                        className="bg-indigo-500 hover:bg-indigo-600 text-white"
+                        className="bg-purple-500 text-white"
                       >
                         Add Friend
                       </Button>
@@ -334,10 +334,10 @@
             <div
               key={contact.id}
               className={cn(
-                "flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors",
+                "flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors m-2",
                 selectedContact?.id === contact.id
-                  ? "bg-purple-100 dark:bg-[#E91E63]"
-                  : "hover:bg-gray-100 dark:hover:bg-[#2A1C45]"
+                  ? "bg-purple-500 dark:bg-[#E91E63]"
+                  : "hover:bg-purple-500 dark:hover:bg-[#2A1C45]"
               )}
               onClick={() => {
                 setSelectedContact(contact);
@@ -360,10 +360,10 @@
               {!collapsed && (
                 <div className="flex-1 min-w-0">
                   <div className="flex justify-between items-start">
-                    <span className="font-medium truncate">{contact.name}</span>
+                    <span className="font-medium truncate text-purple-50">{contact.name}</span>
                     {contact.verified && <BadgeCheck className="h-4 w-4 text-blue-500" />}
                   </div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{contact.lastMessage}</p>
+                  <p className="text-sm text-purple-50 dark:text-gray-400 truncate">{contact.lastMessage}</p>
                 </div>
               )}
             </div>
@@ -377,7 +377,7 @@
             <Button
               onClick={toggleTheme}
               variant="outline"
-              className="w-full justify-start mb-2 text-gray-800 dark:text-white"
+              className="bg-purple-500 outline-none border-none w-full justify-start mb-2 text-white dark:text-white"
             >
               {theme === 'light' ? <Moon className="mr-2 h-5 w-5" /> : <Sun className="mr-2 h-5 w-5" />}
               {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
@@ -387,7 +387,7 @@
             onClick={handleLogout}
             variant="ghost"
             className={cn(
-              "w-full justify-start text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-[#2A1C45]",
+              "w-full justify-start text-white bg-purple-500 dark:text-white hover:bg-gray-100 dark:hover:bg-[#2A1C45]",
               collapsed && "px-0 justify-center"
             )}
           >
@@ -427,7 +427,7 @@
         </div>
 
         {/* Main Chat Area */}
-        <div className="flex-1 flex flex-col bg-gray-50 dark:bg-[#2A1C45] overflow-hidden">
+        <div className="flex-1 flex flex-col bg-[#F1E6FF] dark:bg-[#2A1C45] overflow-hidden">
           {selectedContact ? (
             <>
               <div className="px-4 py-3 flex items-center justify-between border-b border-gray-200 dark:border-[#3A2955]">
@@ -458,7 +458,7 @@
               })()}
             </>
           ) : (
-            <div className="flex-1 flex items-center justify-center text-gray-800 dark:text-white">
+            <div className="flex-1 flex items-center justify-center bg-[#F1E6FF] text-gray-800 dark:text-white">
               <div className="text-center space-y-4">
                 <h3 className="text-xl font-semibold">Welcome to Connectify</h3>
                 <p className="text-gray-600 dark:text-gray-400">Select a chat to start messaging</p>

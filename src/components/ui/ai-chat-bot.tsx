@@ -59,8 +59,7 @@ const ConnectAIPage = () => {
         toast.error('Error: Could not get a response');
       }
     } catch (error) {
-      console.error('Error sending message:', error);
-      toast.error('Error: Network issue or server error.');
+      toast.error('Something went wrong. Please Relogin again.');
     } finally {
       setLoading(false);
     }
@@ -95,7 +94,7 @@ const ConnectAIPage = () => {
                 <AvatarFallback>{chat.role === 'user' ? 'U' : 'AI'}</AvatarFallback>
               </Avatar>
               <div
-                className={`rounded-2xl px-4 py-2 text-sm ${chat.role === 'user' ? 'bg-purple-600 text-white' : 'bg-gray-200 text-gray-800'}`}
+                className={`rounded-lg px-4 py-2 text-sm ${chat.role === 'user' ? 'bg-purple-600 text-white' : 'bg-[#3D2B6B] text-purple-50'}`}
               >
                 <p>{chat.content}</p>
                 <span className="text-xs opacity-70 mt-1 block">
@@ -113,7 +112,7 @@ const ConnectAIPage = () => {
             type="text"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            className="flex-1 dark:bg-[#3a2955] bg-gray-100 border-transparent text-gray-800 placeholder-gray-400 dark:text-white"
+            className="bg-[#E7D7F7] flex-1 dark:bg-[#3a2955] border-transparent text-gray-800 placeholder-gray-400 dark:text-white"
             placeholder="Type a message..."
             disabled={loading}
           />
