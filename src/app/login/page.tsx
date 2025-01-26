@@ -9,12 +9,14 @@ import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { AlertCircle } from 'lucide-react'
 import Link from 'next/link'
+import { toast, Toaster } from 'sonner'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const router = useRouter()
+  const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -32,19 +34,23 @@ export default function LoginPage() {
         if (response.ok) {
           const data = await response.json()
           const username = data.username;
+          toast.success('Login successful', { duration: 3000 }) 
+          await delay(3000);
           router.push(`/chat/${username}`)
         } else {
           const data = await response.json()
           setError(data.error)
+          toast.error(data.error || 'Login failed')  // Error toast
         }
       }
     } catch (error) {
       setError('An unexpected error occurred. Please try again.')
+      toast.error('An unexpected error occurred')  // Error toast
     }
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br  from-indigo-500 to-purple-600">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-indigo-500 to-purple-600">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -116,7 +122,7 @@ export default function LoginPage() {
           </form>
         </Card>
       </motion.div>
+      <Toaster richColors position='top-center' /> {/* Render the Toaster to display toasts */}
     </div>
   )
 }
-
